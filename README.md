@@ -153,24 +153,31 @@ Quel est le type de l'objet `df`?
 Que permettent les méthodes suivantes?
 ###### df.shape
 ```
+dimensions df
 ```
 ###### df.head
 ```
+5 première et 5 dernières
 ```
 ###### df.tail
 ```
+fin
 ```
 ###### df.columns
 ```
+colnames
 ```
 ###### df.dtypes
 ```
+colnames + type value
 ```
 ###### df.info
 ```
+environ meme chose que dtypes
 ```
 ###### df.describe
 ```
+donne moyenne ... des colomn dont le type est connue
 ```
 
 ##### Accès aux éléments d'une table de données
@@ -190,16 +197,20 @@ On peut accéder aux valeurs du DataFrame via des indices ou plages d'indice. La
 Il y a différentes manières de le faire, l'utilisation de `.iloc[slice_ligne,slice_colonne]` constitue une des solutions les plus simples. N'oublions pas que shape permet d'obtenir les dimensions (lignes et colonnes) du DataFrame.
 ###### Acceder aux cinq premières lignes de toutes les colonnes
 ```python
+df.iloc[:5,:]
 
 ```
 
 ###### Acceder à toutes les lignes de la dernière colonne
 ```python
+df.iloc[:,1]
 
 ```
 
 ###### Acceder aux cinq premières lignes des colonnes 0, 2 et 3
 ```python
+df.iloc[:5,[0,2,3]]
+
 
 ```
 
@@ -245,7 +256,28 @@ df.loc[ df['Gene Symbol'].isin(['fadR', 'arcA'] ) ]
 
 ##### 3. A partir de cette échantillon de ratio d'abondance,  estimez la moyenne <img src="https://render.githubusercontent.com/render/math?math=\mu"> et l'ecart-type <img src="https://render.githubusercontent.com/render/math?math=\sigma"> d'une loi normale.
 ```
+from math import sqrt
 
+abund = df['Log2 Corrected Abundance Ratio'].tolist()
+fig, ax =plt.subplots()
+ax.hist(abund,bins=100)
+ax.set_xlabel('Log2 Corrected Abundance Ratio')
+ax.set_ylabel("protein counts")
+
+##estimators
+n = len(abund)
+mu = np.mean(abund)
+S2 = np.std(abund) * np.std(abund)
+S2 = ( n/ (n - 1) ) * S2
+sigma = sqrt(S2)
+
+##Compute normal dist
+x = np.linspace(-4, 1, 100)
+y = norm.pdf(x,loc = mu, scale = sigma)
+ax.plot(x,y,'-r',lw=5, alpha=0.6 )
+
+
+fig.show()
 
 ```
 
@@ -265,7 +297,7 @@ ax.plot(x, norm.pdf(x, mu, sqrt(S_2))*scale) # compute theoritical PDF and draw 
 ##### 5. Quelles remarques peut-on faire à l'observation de l'histogramme et de loi théorique?
 
 ```
-
+log(ratio) < 0 -> ratio < 1 ->  moins de proteine en présence de tetracycline
 
 ```
 
